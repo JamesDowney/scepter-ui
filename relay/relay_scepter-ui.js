@@ -60,7 +60,8 @@ function skillBox(availableSkill) {
 
 // This is the element that will show today's skill
 const dailySkill =`<h1 class='skills-divider'>Today is the ${kol.todayToString().slice(-2)}${kol.todayToString().slice(-1) == 1 ? "st" : kol.todayToString().slice(-1) == 2 ? "nd" : kol.todayToString().slice(-1) == 3 ? "rd" : "th"}!</h1>
-<h3 class='skills-divider'>This one is a freebie!</h3>`;
+<h3 class='skills-divider'>This one is a freebie!</h3>
+${skillBox(scepterSkills[kol.todayToString().slice(-2)-1].skill)}`;
 
 // This constructs the portion of html that contains the good skills
 const goodSkills = scepterSkills.filter(x => x.good && x.available).map(x => skillBox(x.skill)).join("\n");
@@ -159,8 +160,7 @@ module.exports.main = () => {
       css,
       "</head>",
       "<body>",
-      `${kol.canInteract() ? dailySkill : ""}`,
-      `${skillBox(scepterSkills[kol.todayToString().slice(-2)-1].skill)}`,
+      `${kol.canInteract() && scepterSkills[kol.todayToString().slice(-2)-1].available ? dailySkill : ""}`,
       "<h1 class='skills-divider'>Good Skills</h1>",
       goodSkills,
       "",
