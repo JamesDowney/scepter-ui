@@ -159,7 +159,7 @@ module.exports.main = () => {
       css,
       "</head>",
       "<body>",
-      `${kol.canInteract ? dailySkill : ""}`,
+      `${kol.canInteract() ? dailySkill : ""}`,
       `${skillBox(scepterSkills[kol.todayToString().slice(-2)-1].skill)}`,
       "<h1 class='skills-divider'>Good Skills</h1>",
       goodSkills,
