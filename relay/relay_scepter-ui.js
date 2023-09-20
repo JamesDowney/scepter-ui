@@ -45,11 +45,11 @@ if (kol.toInt(kol.getProperty("_augSkillsCast")) < 5) {
 }
 
 // Generate a little box to show the skill in the relay window
-function skillBox(availableSkill) {
+function skillBox(availableSkill, disabled) {
   const scepterSkill = scepterSkills.find(x => x.skill == availableSkill);
 
-  return(`<div class="skill-box">
-  <a href="runskillz.php?action=Skillz&whichskill=${scepterSkill.skill.id}&targetplayer=${kol.myId()}&pwd=${kol.myHash()}&quantity=1">
+  return(`<div class="skill-box" ${disabled ? 'style="opacity: 0.5;"' : ""}>
+  <a ${disabled ? '' : `href="runskillz.php?action=Skillz&whichskill=${scepterSkill.skill.id}&targetplayer=${kol.myId()}&pwd=${kol.myHash()}&quantity=1"`}>
   <div class="heading-div">
   <img  alt="${scepterSkill.skill.name}" src="/images/itemimages/aug${scepterSkill.skill.id-7451}.gif"/>
   <h1>${scepterSkill.skill.name.split(": ")[1]}</h1>
@@ -60,20 +60,22 @@ function skillBox(availableSkill) {
   </div>`)
 }
 
-const skillsRemaining = `<h1 class='skills-divider'>You've used ${kol.getProperty("_augSkillsCast")}/5 casts today.</h1>`
+const skillsRemaining = `<h1>You've used ${kol.getProperty("_augSkillsCast")}/5 casts today.</h1>`
 
 // This is the element that will show today's skill
 const dailySkill = kol.canInteract() && scepterSkills[kol.todayToString().slice(-2)-1].available ?
-  `<h1 class='skills-divider'>Today is the ${kol.todayToString().slice(-2)}${kol.todayToString().slice(-1) == 1 ? "st" : kol.todayToString().slice(-1) == 2 ? "nd" : kol.todayToString().slice(-1) == 3 ? "rd" : "th"}!</h1>
-  <h3 class='skills-divider'>This one is a freebie!</h3>
-  ${skillBox(scepterSkills[kol.todayToString().slice(-2)-1].skill)}` :
+  `<h1>Today is the ${kol.todayToString().slice(-2)}${kol.todayToString().slice(-1) == 1 ? "st" : kol.todayToString().slice(-1) == 2 ? "nd" : kol.todayToString().slice(-1) == 3 ? "rd" : "th"}!</h1>
+  <h3>This one is a freebie!</h3>
+  ${skillBox(scepterSkills[kol.todayToString().slice(-2)-1].skill, false)}` :
   "";
 
 // This constructs the portion of html that contains the good skills
-const goodSkills = ["<h1 class='skills-divider'>Good Skills</h1>", scepterSkills.filter(x => x.good && x.available).map(x => skillBox(x.skill)).join("\n")].join("\n");
+const goodSkills = ["<h1 class='collapsible'>Good Skills</h1>", "<div class='content'>", scepterSkills.filter(x => x.good && x.available).map(x => skillBox(x.skill, false)).join("\n"), "</div>"].join("\n");
 
 // This constructs the portion of html that contains the other skills
-const otherSkills = ["<h1 class='skills-divider'>Other Skills</h1>", scepterSkills.filter(x => !x.good && x.available).map(x => skillBox(x.skill)).join("\n")].join("\n");
+const otherSkills = ["<h1 class='collapsible'>Other Skills</h1>", "<div class='content'>", scepterSkills.filter(x => !x.good && x.available).map(x => skillBox(x.skill, false)).join("\n"), "</div>"].join("\n");
+
+const usedSkills = [`<h1 class='collapsible' style='color: gray;'>Used Skills</h1>`, `<div class='content' style='display: none;'>`, scepterSkills.filter(x => !x.available).map(x => skillBox(x.skill, true)).join("\n"), "</div>"].join("\n");
 
 // Here's some styling for the various elements we're using
 const css = `<style type='text/css'>
@@ -86,7 +88,7 @@ body {
   font-family: 'Khand', sans-serif;
 }
 
-.skills-divider {
+h1, h2, h3 {
   width: 100%;
   text-align: center;
 }
@@ -102,7 +104,7 @@ body {
   border-radius: 5px;
   transition: transform .1s;
   background-color: white;
-  box-shadow: 1px 1px black;
+  flex: none;
 }
 
 .skill-box:hover {
@@ -155,8 +157,47 @@ body {
   width: 80%;
 }
 
+/* Style the button that is used to open and close the collapsible content */
+.collapsible {
+  cursor: pointer;
+  width: 95%;
+  border: none;
+  text-align: center;
+  outline: none;
+}
+
+.collapsible:hover {
+  background-color: #ccc;
+}
+
+.content {
+  display: inline-flex;
+  width: 95%;
+  overflow: hidden;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 </style>  
 `;
+
+const js =`
+<script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "none") {
+      content.style.display = "inline-flex";
+    } else {
+      content.style.display = "none";
+    }
+  });
+}
+</script>`
 
 module.exports.main = () => {
   var pageText =
@@ -170,6 +211,8 @@ module.exports.main = () => {
       dailySkill,
       goodSkills,
       otherSkills,
+      usedSkills,
+      js,
       "</body>",
       "</html>",
       "",
