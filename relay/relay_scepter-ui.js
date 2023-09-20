@@ -36,11 +36,13 @@ const scepterSkills = [
 ]
 
 // Set the availability of each skill
-scepterSkills.forEach(day => {
-  if(kol.getProperty(`_aug${day.skill.id - 7451}Cast`) == "false") {
-    Object.assign(day, {available: true})
-  }
-})
+if (kol.toInt(kol.getProperty("_augSkillsCast")) < 5) {
+  scepterSkills.forEach(day => {
+    if(kol.getProperty(`_aug${day.skill.id - 7451}Cast`) == "false") {
+      Object.assign(day, {available: true})
+    }
+  })
+}
 
 // Generate a little box to show the skill in the relay window
 function skillBox(availableSkill) {
@@ -57,6 +59,8 @@ function skillBox(availableSkill) {
   </a>
   </div>`)
 }
+
+const skillsRemaining = `<h1 class='skills-divider'>You've used ${kol.getProperty("_augSkillsCast")}/5 casts today.</h1>`
 
 // This is the element that will show today's skill
 const dailySkill = kol.canInteract() && scepterSkills[kol.todayToString().slice(-2)-1].available ?
@@ -162,6 +166,7 @@ module.exports.main = () => {
       css,
       "</head>",
       "<body>",
+      skillsRemaining,
       dailySkill,
       goodSkills,
       otherSkills,
