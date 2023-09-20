@@ -59,15 +59,17 @@ function skillBox(availableSkill) {
 }
 
 // This is the element that will show today's skill
-const dailySkill =`<h1 class='skills-divider'>Today is the ${kol.todayToString().slice(-2)}${kol.todayToString().slice(-1) == 1 ? "st" : kol.todayToString().slice(-1) == 2 ? "nd" : kol.todayToString().slice(-1) == 3 ? "rd" : "th"}!</h1>
-<h3 class='skills-divider'>This one is a freebie!</h3>
-${skillBox(scepterSkills[kol.todayToString().slice(-2)-1].skill)}`;
+const dailySkill = kol.canInteract() && scepterSkills[kol.todayToString().slice(-2)-1].available ?
+  `<h1 class='skills-divider'>Today is the ${kol.todayToString().slice(-2)}${kol.todayToString().slice(-1) == 1 ? "st" : kol.todayToString().slice(-1) == 2 ? "nd" : kol.todayToString().slice(-1) == 3 ? "rd" : "th"}!</h1>
+  <h3 class='skills-divider'>This one is a freebie!</h3>
+  ${skillBox(scepterSkills[kol.todayToString().slice(-2)-1].skill)}` :
+  "";
 
 // This constructs the portion of html that contains the good skills
-const goodSkills = scepterSkills.filter(x => x.good && x.available).map(x => skillBox(x.skill)).join("\n");
+const goodSkills = ["<h1 class='skills-divider'>Good Skills</h1>", scepterSkills.filter(x => x.good && x.available).map(x => skillBox(x.skill)).join("\n")].join("\n");
 
 // This constructs the portion of html that contains the other skills
-const otherSkills = scepterSkills.filter(x => !x.good && x.available).map(x => skillBox(x.skill)).join("\n")
+const otherSkills = ["<h1 class='skills-divider'>Other Skills</h1>", scepterSkills.filter(x => !x.good && x.available).map(x => skillBox(x.skill)).join("\n")].join("\n");
 
 // Here's some styling for the various elements we're using
 const css = `<style type='text/css'>
@@ -160,11 +162,8 @@ module.exports.main = () => {
       css,
       "</head>",
       "<body>",
-      `${kol.canInteract() && scepterSkills[kol.todayToString().slice(-2)-1].available ? dailySkill : ""}`,
-      "<h1 class='skills-divider'>Good Skills</h1>",
+      dailySkill,
       goodSkills,
-      "",
-      "<h1 class='skills-divider'>Other Skills</h1>",
       otherSkills,
       "</body>",
       "</html>",
