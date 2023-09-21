@@ -1,3 +1,5 @@
+// This is taken straight from w3schools
+// https://www.w3schools.com/howto/howto_js_collapsible.asp
 var coll = document.getElementsByClassName("collapsible");
 var i;
 
