@@ -269,7 +269,7 @@ const otherSkills = [
 ].join("\n");
 // This constructs the portion of html that contains used skills
 const usedSkills = [
-  `<h1 class='collapsible' style='color: gray;'>Used Skills</h1>`,
+  `<h1 class='collapsible' style='opacity: 0.5;'>Used Skills</h1>`,
   `<div class='content' style='display: none;'>`,
   scepterSkills
     .filter((x) => !x.available)
