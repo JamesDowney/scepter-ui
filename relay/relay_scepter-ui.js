@@ -193,7 +193,7 @@ const scepterSkills = [
 // Set the availability of each skill
 if (kol.toInt(kol.getProperty("_augSkillsCast")) < 5) {
   scepterSkills.forEach((day) => {
-    if (kol.getProperty(`_aug${day.skill.id - 7451}Cast`) == "false") {
+    if (!kol.toBoolean(kol.getProperty(day.skill.dailylimitpref))) {
       Object.assign(day, { available: true });
     }
   });
